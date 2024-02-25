@@ -23,7 +23,7 @@ pub struct QueryRoot;
 #[juniper::graphql_object(Context = Context)]
 impl QueryRoot {
     async fn getBalance(
-        ctx: &mut Context,
+        ctx: &Context,
         address: String,
         asset_addresses: Vec<String>
     ) -> FieldResult<Vec<Balance>> {
@@ -41,7 +41,7 @@ impl QueryRoot {
 
         if asset_addresses.len() == 0 {
             // call to moralis to get all token data
-            let data = TokenCache::fetch_tokens(&mut ctx.cache, address).await;
+            let data = ctx.cache.fetch_tokens(address).await;
             result.extend(data);
         } else {
             // For specified token
