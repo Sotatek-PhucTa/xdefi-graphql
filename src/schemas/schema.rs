@@ -1,5 +1,8 @@
+use std::sync::Mutex;
+
 use juniper::{ EmptyMutation, EmptySubscription, FieldResult, RootNode, GraphQLObject };
 
+use crate::context::Context;
 use crate::validates::is_eth_address::{ is_valid_ethereum_address, is_zero_ethereum_address };
 use crate::errors::Error::{ InvalidAddress };
 use crate::web3::get_native_balance::get_balance;
@@ -17,9 +20,10 @@ pub struct Balance {
 
 pub struct QueryRoot;
 
-#[juniper::graphql_object]
+#[juniper::graphql_object(Context = Context)]
 impl QueryRoot {
     async fn getBalance(
+        ctx: &mut Context,
         address: String,
         asset_addresses: Vec<String>
     ) -> FieldResult<Vec<Balance>> {
@@ -37,8 +41,8 @@ impl QueryRoot {
 
         if asset_addresses.len() == 0 {
             // call to moralis to get all token data
-            // let data = context.cache.fetch_tokens(address).await;
-            // result.extent(data);
+            let data = TokenCache::fetch_tokens(&mut ctx.cache, address).await;
+            result.extend(data);
         } else {
             // For specified token
             let mut assets_without_native: Vec<String> = Vec::new();
@@ -71,7 +75,7 @@ impl QueryRoot {
     }
 }
 
-pub type Schema = RootNode<'static, QueryRoot, EmptyMutation, EmptySubscription>;
+pub type Schema = RootNode<'static, QueryRoot, EmptyMutation<Context>, EmptySubscription<Context>>;
 
 pub fn create_schema() -> Schema {
     Schema::new(QueryRoot {}, EmptyMutation::new(), EmptySubscription::new())

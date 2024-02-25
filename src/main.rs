@@ -11,10 +11,12 @@ mod errors;
 mod web3;
 mod external_api;
 mod cache;
+mod context;
 
 use crate::routes::ping::rping;
 use crate::schemas::schema::{ create_schema, Schema };
 use crate::cache::TokenCache;
+use crate::context::Context;
 
 /// Playground
 #[get("/graphiql")]
@@ -24,9 +26,12 @@ async fn graphql_playground() -> impl Responder {
 
 /// Endpoint
 #[route("/graphql", method = "GET", method = "POST")]
-async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl Responder {
-    println!("{:?} st ne ", data);
-    let user = data.execute(&st, &()).await;
+async fn graphql(
+    st: web::Data<Schema>,
+    data: web::Json<GraphQLRequest>,
+    ctx: web::Data<Context>
+) -> impl Responder {
+    let user = data.execute(&st, &ctx).await;
     HttpResponse::Ok().json(user)
 }
 
@@ -34,8 +39,9 @@ async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    // let mut token_cache = TokenCache::new(NonZeroUsize::new(100).unwrap());
-
+    let token_cache = TokenCache::new();
+    // Create an instance of your context, passing the token cache
+    let context = std::sync::Arc::new(Context::new(token_cache));
     let schema = std::sync::Arc::new(create_schema());
 
     let port = 8080;
@@ -46,6 +52,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move ||
         App::new()
             .app_data(web::Data::from(schema.clone()))
+            .app_data(web::Data::from(context.clone()))
             .service(graphql)
             .service(graphql_playground)
             .service(rping)
