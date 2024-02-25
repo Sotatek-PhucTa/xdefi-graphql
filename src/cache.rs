@@ -28,13 +28,16 @@ impl TokenCache {
         let mut cache = self.cache.write().await;
 
         // Check if the cache was updated within the last minute
-        if let Some(last_update_time) = cache.get(&user).unwrap().last_update_time {
-            if let Ok(elapsed) = last_update_time.elapsed() {
-                if elapsed < Duration::from_secs(60) {
-                    // Return tokens from cache if updated within the last minute
-                    if let Some(tokens) = cache.get(&user) {
-                        let data = &tokens.data;
-                        return data.clone();
+        if let Some(user_data) = cache.get(&user) {
+            if let Some(last_update_time) = user_data.last_update_time {
+                if let Ok(elapsed) = last_update_time.elapsed() {
+                    if elapsed < Duration::from_secs(60) {
+                        // Return tokens from cache if updated within the last minute
+                        println!("Get from cache");
+                        if let Some(tokens) = cache.get(&user) {
+                            let data = &tokens.data;
+                            return data.clone();
+                        }
                     }
                 }
             }
