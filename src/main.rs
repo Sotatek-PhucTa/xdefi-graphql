@@ -34,7 +34,7 @@ async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    let mut token_cache = TokenCache::new(NonZeroUsize::new(100).unwrap());
+    // let mut token_cache = TokenCache::new(NonZeroUsize::new(100).unwrap());
 
     let schema = std::sync::Arc::new(create_schema());
 

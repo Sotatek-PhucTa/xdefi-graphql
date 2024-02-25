@@ -1,4 +1,4 @@
-use std::env;
+use std::{ env, num::NonZeroUsize };
 use dotenv::dotenv;
 use crate::errors::Error;
 
@@ -45,4 +45,19 @@ pub fn get_moralis_key() -> Result<String, Error> {
         }
     }
     Ok(get_moalis)
+}
+
+pub fn get_cache_size() -> Result<NonZeroUsize, Error> {
+    // Load environment variables from the .env file
+    dotenv().ok();
+    let get_cache_size;
+    match env::var("CACHE_SIZE") {
+        Ok(value) => {
+            get_cache_size = NonZeroUsize::new(value.parse().unwrap()).unwrap();
+        }
+        Err(_) => {
+            return Err(Error::InvalidEnv.into());
+        }
+    }
+    Ok(get_cache_size)
 }
