@@ -5,14 +5,14 @@ use crate::errors::Error::{ InvalidAddress };
 use crate::web3::get_native_balance::get_balance;
 use crate::web3::get_token_balance::get_balances;
 use crate::web3::get_decimals::get_decimals;
-use crate::external_api::moralis::{ TokenData };
+use crate::cache::TokenCache;
 
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Clone)]
 #[graphql(description = "Balance")]
-struct Balance {
-    asset_address: String,
-    value: String,
-    decimals: i32,
+pub struct Balance {
+    pub asset_address: String,
+    pub value: String,
+    pub decimals: i32,
 }
 
 pub struct QueryRoot;
@@ -37,19 +37,8 @@ impl QueryRoot {
 
         if asset_addresses.len() == 0 {
             // call to moralis to get all token data
-            let moralis_data = TokenData::get(&address).await.unwrap();
-            let data = moralis_data
-                .iter()
-                .map(|el| {
-                    Balance {
-                        asset_address: el.token_address.clone(),
-                        value: el.balance.clone(),
-                        decimals: el.decimals as i32,
-                    }
-                })
-                .collect::<Vec<Balance>>();
-
-            result.extend(data);
+            // let data = context.cache.fetch_tokens(address).await;
+            // result.extent(data);
         } else {
             // For specified token
             let mut assets_without_native: Vec<String> = Vec::new();
