@@ -14,7 +14,6 @@ pub fn get_rpc() -> Result<String, Error> {
             return Err(Error::InvalidEnv.into());
         }
     }
-    println!("{}", get_rpc);
     Ok(get_rpc)
 }
 
@@ -30,6 +29,20 @@ pub fn get_mullticall_address() -> Result<String, Error> {
             return Err(Error::InvalidEnv.into());
         }
     }
-    println!("{}", get_multicall);
     Ok(get_multicall)
+}
+
+pub fn get_moralis_key() -> Result<String, Error> {
+    // Load environment variables from the .env file
+    dotenv().ok();
+    let get_moalis;
+    match env::var("MORALIS_KEY") {
+        Ok(value) => {
+            get_moalis = value;
+        }
+        Err(_) => {
+            return Err(Error::InvalidEnv.into());
+        }
+    }
+    Ok(get_moalis)
 }

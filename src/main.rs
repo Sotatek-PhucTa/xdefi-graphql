@@ -8,6 +8,7 @@ mod schemas;
 mod validates;
 mod errors;
 mod web3;
+mod external_api;
 
 use crate::routes::ping::rping;
 use crate::schemas::schema::{ create_schema, Schema };
