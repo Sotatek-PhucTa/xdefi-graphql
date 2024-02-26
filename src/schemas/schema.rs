@@ -1,5 +1,3 @@
-use std::sync::Mutex;
-
 use juniper::{ EmptyMutation, EmptySubscription, FieldResult, RootNode, GraphQLObject };
 
 use crate::context::Context;
@@ -8,7 +6,6 @@ use crate::errors::Error::{ InvalidAddress };
 use crate::web3::get_native_balance::get_balance;
 use crate::web3::get_token_balance::get_balances;
 use crate::web3::get_decimals::get_decimals;
-use crate::cache::TokenCache;
 
 #[derive(GraphQLObject, Clone)]
 #[graphql(description = "Balance")]

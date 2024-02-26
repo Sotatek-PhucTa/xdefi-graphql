@@ -1,6 +1,5 @@
-use reqwest::{ Error, header, Client };
+use reqwest::{ Error, Client };
 use serde_derive::{ Deserialize, Serialize };
-use std::env;
 use crate::validates::env::{ get_moralis_key };
 
 // #[derive(Serialize, Deserialize, Debug)]

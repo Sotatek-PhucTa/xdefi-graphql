@@ -1,7 +1,6 @@
 use actix_web::{ get, web, App, HttpServer, Responder, middleware, HttpResponse, route };
 use actix_cors::Cors;
 use actix_web_lab::respond::Html;
-use std::num::NonZeroUsize;
 use juniper::http::{ graphiql::graphiql_source, GraphQLRequest };
 
 mod routes;
